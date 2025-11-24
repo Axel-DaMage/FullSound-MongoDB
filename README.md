@@ -2,77 +2,59 @@
 
 Proyecto Node.js con MongoDB utilizando el driver nativo de MongoDB.
 
-## 🚀 Instalación
+## Instalación
 
 ```bash
 npm install
 ```
 
-## ⚙️ Configuración
+## Configuración
 
-1. Copia el archivo `.env.example` a `.env`:
-```bash
-cp .env.example .env
-```
+Crea un archivo `.env` con tu configuración de MongoDB:
 
-2. Edita el archivo `.env` con tu configuración de MongoDB:
 ```env
 MONGODB_URI=mongodb://localhost:27017/fullsound
 DB_NAME=fullsound
 PORT=3000
 ```
 
-## 📦 Estructura del Proyecto
+## Scripts Disponibles
 
-```
-FullSound-MongoDB/
-├── src/
-│   ├── config/
-│   │   └── database.js      # Configuración de conexión a MongoDB
-│   ├── controllers/         # Controladores de la aplicación
-│   ├── models/              # Modelos de datos
-│   ├── routes/              # Rutas de la aplicación
-│   └── index.js             # Punto de entrada principal
-├── .env.example             # Ejemplo de variables de entorno
-├── .gitignore
-├── package.json
-└── README.md
-```
+- `npm start` - Inicia la aplicación
+- `npm run dev` - Modo desarrollo con nodemon
+- `npm run seed` - Poblar base de datos con datos de ejemplo
 
-## 🎯 Scripts Disponibles
+## Sistema de Contraseñas
 
-- `npm start` - Inicia la aplicación en modo producción
-- `npm run dev` - Inicia la aplicación en modo desarrollo con nodemon (reinicio automático)
+El proyecto utiliza bcrypt para hash seguro de contraseñas.
 
-## 💾 Uso de MongoDB
-
-### Conectar a la base de datos
-
+### Crear usuario
 ```javascript
-const { connect, getDb } = require('./config/database');
+const { crearUsuario } = require('./src/models/usuario');
 
-async function ejemplo() {
-  await connect();
-  const db = getDb();
-  
-  // Usar la base de datos
-  const collection = db.collection('usuarios');
-  const usuarios = await collection.find({}).toArray();
-  console.log(usuarios);
-}
+await crearUsuario({
+  nombre_usuario: 'usuario',
+  correo: 'usuario@example.com',
+  contrasena: 'contraseña',
+  id_tipo_usuario: tipoUsuarioId
+});
 ```
 
-## 📚 Dependencias
+### Autenticar usuario
+```javascript
+const { autenticarUsuario } = require('./src/models/usuario');
 
-- **mongodb**: Driver oficial de MongoDB para Node.js
-- **dotenv**: Gestión de variables de entorno
-- **nodemon**: Herramienta de desarrollo para reinicio automático
+const usuario = await autenticarUsuario('usuario@example.com', 'contraseña');
+```
 
-## 🔧 Requisitos
+## Dependencias
+
+- mongodb - Driver oficial de MongoDB
+- bcrypt - Hash de contraseñas
+- dotenv - Variables de entorno
+- nodemon - Desarrollo
+
+## Requisitos
 
 - Node.js >= 14.x
-- MongoDB >= 4.x (local o MongoDB Atlas)
-
-## 📝 Licencia
-
-ISC
+- MongoDB >= 4.x

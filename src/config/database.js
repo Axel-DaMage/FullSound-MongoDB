@@ -15,10 +15,10 @@ async function connect() {
     client = new MongoClient(uri);
     await client.connect();
     db = client.db(dbName);
-    console.log('✅ Conectado exitosamente a MongoDB');
+    console.log('Conectado exitosamente a MongoDB');
     return db;
   } catch (error) {
-    console.error('❌ Error al conectar a MongoDB:', error);
+    console.error('Error al conectar a MongoDB:', error);
     throw error;
   }
 }
@@ -39,7 +39,7 @@ function getDb() {
 async function close() {
   if (client) {
     await client.close();
-    console.log('🔌 Conexión a MongoDB cerrada');
+    console.log('Conexión a MongoDB cerrada');
   }
 }
 
