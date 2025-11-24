@@ -39,6 +39,7 @@ db.createCollection('usuario', {
 db.usuario.createIndex({ nombre_usuario: 1 }, { unique: true });
 db.usuario.createIndex({ correo: 1 }, { unique: true });
 
+
 // ===== 3. BEATS =====
 db.createCollection('beat', {
     validator: {
@@ -108,6 +109,7 @@ db.beat.createIndex({ genero: 1 });
 db.beat.createIndex({ fecha_subida: -1 });
 db.beat.createIndex({ precio: 1 });
 
+
 // ===== 4. COMPRAS =====
 db.createCollection('compra', {
     validator: {
@@ -156,6 +158,7 @@ db.compra.createIndex({ usuario_id: 1 });
 db.compra.createIndex({ fecha: -1 });
 db.compra.createIndex({ estado: 1 });
 
+
 // ===== 5. DETALLE DE COMPRA =====
 db.createCollection('compra_detalle', {
     validator: {
@@ -199,6 +202,7 @@ db.createCollection('compra_detalle', {
 db.compra_detalle.createIndex({ compra_id: 1 });
 db.compra_detalle.createIndex({ beat_id: 1 });
 
+
 // ===== 6. REPRODUCCIONES =====
 db.createCollection('reproduccion', {
     validator: {
@@ -227,6 +231,7 @@ db.createCollection('reproduccion', {
 db.reproduccion.createIndex({ beat_id: 1 });
 db.reproduccion.createIndex({ usuario_id: 1 });
 db.reproduccion.createIndex({ fecha: -1 });
+
 
 // ===== 7. COMENTARIOS =====
 db.createCollection('comentario', {
@@ -258,7 +263,7 @@ db.createCollection('comentario', {
                 },
                 comentario_padre_id: {
                     bsonType: ['objectId', 'null'],
-                    description: 'Referencia a comentario padre (para respuestas)'
+                    description: 'Referencia a comentario padre (para respuestas o hilos)'
                 }
             }
         }
@@ -270,6 +275,7 @@ db.comentario.createIndex({ usuario_id: 1 });
 db.comentario.createIndex({ beat_id: 1 });
 db.comentario.createIndex({ fecha: -1 });
 db.comentario.createIndex({ comentario_padre_id: 1 });
+
 
 // ===== 8. LIKES =====
 db.createCollection('like_beat', {
@@ -295,9 +301,10 @@ db.createCollection('like_beat', {
     }
 });
 
-// Crear índice compuesto único para evitar likes duplicados
+// Índice único para evitar likes duplicados
 db.like_beat.createIndex({ usuario_id: 1, beat_id: 1 }, { unique: true });
 db.like_beat.createIndex({ beat_id: 1 });
+
 
 // ===== MENSAJE DE CONFIRMACIÓN =====
 console.log('Todas las colecciones han sido creadas exitosamente');
