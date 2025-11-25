@@ -126,17 +126,17 @@ db.createCollection('compra', {
                     description: 'Fecha de la compra'
                 },
                 subtotal: {
-                    bsonType: 'double',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     description: 'Subtotal sin IVA'
                 },
                 iva_total: {
-                    bsonType: 'double',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     description: 'Monto total del IVA'
                 },
                 total_con_iva: {
-                    bsonType: 'double',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     description: 'Total con IVA incluido'
                 },
@@ -175,17 +175,17 @@ db.createCollection('compra_detalle', {
                     description: 'Referencia al beat comprado'
                 },
                 precio_base: {
-                    bsonType: 'double',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     description: 'Precio base del beat sin IVA'
                 },
                 iva_monto: {
-                    bsonType: 'double',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     description: 'Monto del IVA'
                 },
                 precio_con_iva: {
-                    bsonType: 'double',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     description: 'Precio con IVA incluido'
                 },

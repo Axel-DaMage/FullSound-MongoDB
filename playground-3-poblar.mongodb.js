@@ -651,126 +651,126 @@ async function seedData() {
     console.log('CREANDO REPRODUCCIONES');
 
     await db.collection('reproduccion').insertMany([
-    {
-        beat_id: beats.insertedIds['0'],
-        usuario_id: maria._id,
-        fecha: new Date()
-    },
-    {
-        beat_id: beats.insertedIds['0'],
-        usuario_id: ana._id,
-        fecha: new Date()
-    },
-    {
-        beat_id: beats.insertedIds['1'],
-        usuario_id: dj_luis._id,
-        fecha: new Date()
-    },
-    {
-        beat_id: beats.insertedIds['2'],
-        usuario_id: sofia._id,
-        fecha: new Date()
-    },
-    {
-        beat_id: beats.insertedIds['3'],
-        usuario_id: carlos._id,
-        fecha: new Date()
-    },
-    // Reproducciones anónimas
-    {
-        beat_id: beats.insertedIds['5'],
-        usuario_id: null,
-        fecha: new Date()
-    },
-    {
-        beat_id: beats.insertedIds['6'],
-        usuario_id: null,
-        fecha: new Date()
-    }
-]);
+        {
+            beat_id: beats.insertedIds['0'],
+            usuario_id: maria._id,
+            fecha: new Date()
+        },
+        {
+            beat_id: beats.insertedIds['0'],
+            usuario_id: ana._id,
+            fecha: new Date()
+        },
+        {
+            beat_id: beats.insertedIds['1'],
+            usuario_id: dj_luis._id,
+            fecha: new Date()
+        },
+        {
+            beat_id: beats.insertedIds['2'],
+            usuario_id: sofia._id,
+            fecha: new Date()
+        },
+        {
+            beat_id: beats.insertedIds['3'],
+            usuario_id: carlos._id,
+            fecha: new Date()
+        },
+        // Reproducciones anónimas
+        {
+            beat_id: beats.insertedIds['5'],
+            usuario_id: null,
+            fecha: new Date()
+        },
+        {
+            beat_id: beats.insertedIds['6'],
+            usuario_id: null,
+            fecha: new Date()
+        }
+    ]);
 
-console.log('Reproducciones creadas');
+    console.log('Reproducciones creadas');
 
-// ===== CREAR COMENTARIOS =====
-console.log('CREANDO COMENTARIOS');
+    // ===== CREAR COMENTARIOS =====
+    console.log('CREANDO COMENTARIOS');
 
-await db.collection('comentario').insertMany([
-    {
-        usuario_id: maria._id,
-        beat_id: beats.insertedIds['0'],
-        contenido: 'Este beat está increíble, me inspiró mucho!',
-        fecha: new Date(),
-        editado: false,
-        comentario_padre_id: null
-    },
-    {
-        usuario_id: ana._id,
-        beat_id: beats.insertedIds['2'],
-        contenido: 'Muy profesional, me encanta el estilo.',
-        fecha: new Date(),
-        editado: false,
-        comentario_padre_id: null
-    },
-    {
-        usuario_id: dj_luis._id,
-        beat_id: beats.insertedIds['4'],
-        contenido: 'Tiene tremenda energía, perfecto para reggaeton.',
-        fecha: new Date(),
-        editado: false,
-        comentario_padre_id: null
-    },
-    {
-        usuario_id: carlos._id,
-        beat_id: beats.insertedIds['7'],
-        contenido: 'Amo las texturas de este beat.',
-        fecha: new Date(),
-        editado: false,
-        comentario_padre_id: null
-    },
-    // Respuesta
-    {
-        usuario_id: sofia._id,
-        beat_id: beats.insertedIds['7'],
-        contenido: 'Sí! También me encantó la producción.',
-        fecha: new Date(),
-        editado: false,
-        comentario_padre_id: null
-    }
-]);
+    await db.collection('comentario').insertMany([
+        {
+            usuario_id: maria._id,
+            beat_id: beats.insertedIds['0'],
+            contenido: 'Este beat está increíble, me inspiró mucho!',
+            fecha: new Date(),
+            editado: false,
+            comentario_padre_id: null
+        },
+        {
+            usuario_id: ana._id,
+            beat_id: beats.insertedIds['2'],
+            contenido: 'Muy profesional, me encanta el estilo.',
+            fecha: new Date(),
+            editado: false,
+            comentario_padre_id: null
+        },
+        {
+            usuario_id: dj_luis._id,
+            beat_id: beats.insertedIds['4'],
+            contenido: 'Tiene tremenda energía, perfecto para reggaeton.',
+            fecha: new Date(),
+            editado: false,
+            comentario_padre_id: null
+        },
+        {
+            usuario_id: carlos._id,
+            beat_id: beats.insertedIds['7'],
+            contenido: 'Amo las texturas de este beat.',
+            fecha: new Date(),
+            editado: false,
+            comentario_padre_id: null
+        },
+        // Respuesta
+        {
+            usuario_id: sofia._id,
+            beat_id: beats.insertedIds['7'],
+            contenido: 'Sí! También me encantó la producción.',
+            fecha: new Date(),
+            editado: false,
+            comentario_padre_id: null
+        }
+    ]);
 
-console.log('Comentarios creados');
+    console.log('Comentarios creados');
 
 
-// ===== CREAR LIKES =====
-console.log('CREANDO LIKES');
+    // ===== CREAR LIKES =====
+    console.log('CREANDO LIKES');
 
-await db.collection('like_beat').insertMany([
-    {
-        usuario_id: maria._id,
-        beat_id: beats.insertedIds['0'],
-        fecha: new Date()
-    },
-    {
-        usuario_id: ana._id,
-        beat_id: beats.insertedIds['1'],
-        fecha: new Date()
-    },
-    {
-        usuario_id: carlos._id,
-        beat_id: beats.insertedIds['2'],
-        fecha: new Date()
-    },
-    {
-        usuario_id: sofia._id,
-        beat_id: beats.insertedIds['3'],
-        fecha: new Date()
-    },
-    {
-        usuario_id: dj_luis._id,
-        beat_id: beats.insertedIds['4'],
-        fecha: new Date()
-    }
-]);
+    await db.collection('like_beat').insertMany([
+        {
+            usuario_id: maria._id,
+            beat_id: beats.insertedIds['0'],
+            fecha: new Date()
+        },
+        {
+            usuario_id: ana._id,
+            beat_id: beats.insertedIds['1'],
+            fecha: new Date()
+        },
+        {
+            usuario_id: carlos._id,
+            beat_id: beats.insertedIds['2'],
+            fecha: new Date()
+        },
+        {
+            usuario_id: sofia._id,
+            beat_id: beats.insertedIds['3'],
+            fecha: new Date()
+        },
+        {
+            usuario_id: dj_luis._id,
+            beat_id: beats.insertedIds['4'],
+            fecha: new Date()
+        }
+    ]);
 
     console.log('Likes creados');
 

@@ -1,330 +1,289 @@
-// MongoDB Playground - Consultas de Ejemplo FullSound
-// Consultas comunes para el sistema
+// playground-4-querys.mongodb.js
+// Consultas FULLSOUND convertidas para Node.js
 
-use('fullsound');
+const { connect, close, getDb } = require('./src/config/database');
 
-// ===== CONSULTAS DE USUARIOS =====
-console.log('========== USUARIOS ==========\n');
+async function runQueries() {
+    await connect();
+    const db = getDb();
 
-// Listar todos los usuarios
-console.log('Usuarios registrados:');
-db.usuario.find({}, {
-    contrasena: 0  // Excluir contraseña
-}).forEach(user => console.log(user));
+    console.log("========== USUARIOS ==========\n");
 
-// ===== CONSULTAS DE BEATS =====
-console.log('\n========== BEATS ==========\n');
+    // Listar usuarios sin contraseñas
+    const usuarios = await db.collection('usuario')
+        .find({}, { projection: { contrasena: 0 } })
+        .toArray();
 
-// Beats más populares por reproducciones
-console.log('Top 5 Beats por Reproducciones:');
-db.beat.aggregate([
-    {
-        $lookup: {
-            from: 'usuario',
-            localField: 'usuario_id',
-            foreignField: '_id',
-            as: 'artista'
+    console.log("Usuarios registrados:");
+    usuarios.forEach(u => console.log(u));
+
+
+    console.log("\n========== BEATS ==========\n");
+
+    // Top 5 beats por reproducciones
+    console.log("Top 5 Beats por Reproducciones:");
+    const topBeats = await db.collection('beat').aggregate([
+        {
+            $lookup: {
+                from: 'usuario',
+                localField: 'usuario_id',
+                foreignField: '_id',
+                as: 'artista'
+            }
+        },
+        { $unwind: '$artista' },
+        { $sort: { reproducciones: -1 } },
+        { $limit: 5 },
+        {
+            $project: {
+                titulo: 1,
+                genero: 1,
+                reproducciones: 1,
+                likes: 1,
+                precio: 1,
+                artista: '$artista.nombre_usuario'
+            }
         }
-    },
-    {
-        $unwind: '$artista'
-    },
-    {
-        $sort: { reproducciones: -1 }
-    },
-    {
-        $limit: 5
-    },
-    {
-        $project: {
-            titulo: 1,
-            genero: 1,
-            artista: '$artista.nombre_usuario',
-            reproducciones: 1,
-            likes: 1,
-            precio: 1
-        }
+    ]).toArray();
+
+    topBeats.forEach(beat => console.log(beat));
+
+
+    // Beats por género
+    console.log("\nBeats por género:");
+    const beatsPorGenero = await db.collection('beat').aggregate([
+        {
+            $group: {
+                _id: '$genero',
+                cantidad: { $sum: 1 },
+                precio_promedio: { $avg: '$precio' }
+            }
+        },
+        { $sort: { cantidad: -1 } }
+    ]).toArray();
+
+    beatsPorGenero.forEach(g => console.log(g));
+
+
+    // Beats de un artista específico
+    console.log("\nBeats de maria_music:");
+    const maria = await db.collection('usuario').findOne({ nombre_usuario: 'maria_music' });
+
+    if (maria) {
+        const beatsMaria = await db.collection('beat')
+            .find({ usuario_id: maria._id })
+            .toArray();
+
+        beatsMaria.forEach(beat => {
+            console.log(`${beat.titulo} - ${beat.genero} - $${beat.precio}`);
+        });
     }
-]).forEach(beat => console.log(beat));
 
-// Beats por género
-console.log('\nBeats por Género:');
-db.beat.aggregate([
-    {
-        $group: {
-            _id: '$genero',
-            cantidad: { $sum: 1 },
-            precio_promedio: { $avg: '$precio' }
+
+
+    console.log("\n========== COMPRAS ==========\n");
+
+    // Estadísticas de compras
+    const statsCompras = await db.collection('compra').aggregate([
+        {
+            $group: {
+                _id: null,
+                total_compras: { $sum: 1 },
+                ingreso_total: { $sum: '$total_con_iva' },
+                ingreso_promedio: { $avg: '$total_con_iva' }
+            }
         }
-    },
-    {
-        $sort: { cantidad: -1 }
+    ]).toArray();
+
+    console.log("Estadísticas de ventas:");
+    console.log(statsCompras[0]);
+
+
+    // Historial de compras de un usuario
+    console.log("\nHistorial de compras de juan123:");
+    const juan = await db.collection('usuario').findOne({ nombre_usuario: 'juan123' });
+
+    if (juan) {
+        const comprasJuan = await db.collection('compra').aggregate([
+            { $match: { usuario_id: juan._id } },
+            {
+                $lookup: {
+                    from: 'compra_detalle',
+                    localField: '_id',
+                    foreignField: 'compra_id',
+                    as: 'detalles'
+                }
+            },
+            { $unwind: '$detalles' },
+            {
+                $lookup: {
+                    from: 'beat',
+                    localField: 'detalles.beat_id',
+                    foreignField: '_id',
+                    as: 'beat'
+                }
+            },
+            { $unwind: '$beat' },
+            {
+                $project: {
+                    fecha: 1,
+                    beat_titulo: '$beat.titulo',
+                    precio_con_iva: '$detalles.precio_con_iva',
+                    total_compra: '$total_con_iva',
+                    estado: 1
+                }
+            }
+        ]).toArray();
+
+        comprasJuan.forEach(c => console.log(c));
     }
-]).forEach(genero => console.log(genero));
 
-// Beats de un artista específico
-console.log('\nBeats de juan_producer:');
-const juan = db.usuario.findOne({ nombre_usuario: 'juan_producer' });
-db.beat.find({ usuario_id: juan._id }).forEach(beat => {
-    console.log(`${beat.titulo} - ${beat.genero} - $${beat.precio}`);
-});
 
-// ===== CONSULTAS DE COMPRAS =====
-console.log('\n========== COMPRAS ==========\n');
 
-// Total de ventas
-console.log('Estadísticas de Ventas:');
-db.compra.aggregate([
-    {
-        $group: {
-            _id: null,
-            total_compras: { $sum: 1 },
-            ingreso_total: { $sum: '$total_con_iva' },
-            ingreso_promedio: { $avg: '$total_con_iva' }
+    console.log("\n========== REPRODUCCIONES ==========\n");
+
+    const reproducciones = await db.collection('reproduccion').aggregate([
+        {
+            $group: {
+                _id: '$beat_id',
+                total_reproducciones: { $sum: 1 },
+                duracion_promedio: { $avg: '$duracion_segundos' }
+            }
+        },
+        {
+            $lookup: {
+                from: 'beat',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'beat'
+            }
+        },
+        { $unwind: '$beat' },
+        { $sort: { total_reproducciones: -1 } },
+        {
+            $project: {
+                titulo: '$beat.titulo',
+                genero: '$beat.genero',
+                total_reproducciones: 1,
+                duracion_promedio: 1
+            }
         }
+    ]).toArray();
+
+    reproducciones.forEach(r => console.log(r));
+
+
+    console.log("\n========== COMENTARIOS ==========\n");
+
+    const primerBeat = await db.collection('beat').findOne();
+
+    if (primerBeat) {
+        const comentarios = await db.collection('comentario').aggregate([
+            { $match: { beat_id: primerBeat._id } },
+            {
+                $lookup: {
+                    from: 'usuario',
+                    localField: 'usuario_id',
+                    foreignField: '_id',
+                    as: 'usuario'
+                }
+            },
+            { $unwind: '$usuario' },
+            { $sort: { fecha: -1 } },
+            {
+                $project: {
+                    autor: '$usuario.nombre_usuario',
+                    contenido: 1,
+                    fecha: 1
+                }
+            }
+        ]).toArray();
+
+        comentarios.forEach(c => console.log(c));
     }
-]).forEach(stats => console.log(stats));
 
-// Compras de un usuario con detalles
-console.log('\nHistorial de Compras de carlos_listener:');
-const carlos = db.usuario.findOne({ nombre_usuario: 'carlos_listener' });
-db.compra.aggregate([
-    {
-        $match: { usuario_id: carlos._id }
-    },
-    {
-        $lookup: {
-            from: 'compra_detalle',
-            localField: '_id',
-            foreignField: 'compra_id',
-            as: 'detalles'
-        }
-    },
-    {
-        $unwind: '$detalles'
-    },
-    {
-        $lookup: {
-            from: 'beat',
-            localField: 'detalles.beat_id',
-            foreignField: '_id',
-            as: 'beat'
-        }
-    },
-    {
-        $unwind: '$beat'
-    },
-    {
-        $project: {
-            fecha: 1,
-            beat_titulo: '$beat.titulo',
-            precio_con_iva: '$detalles.precio_con_iva',
-            total_compra: '$total_con_iva',
-            estado: 1
-        }
-    }
-]).forEach(compra => console.log(compra));
 
-// ===== CONSULTAS DE REPRODUCCIONES =====
-console.log('\n========== REPRODUCCIONES ==========\n');
 
-// Reproducciones por beat
-console.log('Top Beats por Reproducciones:');
-db.reproduccion.aggregate([
-    {
-        $group: {
-            _id: '$beat_id',
-            total_reproducciones: { $sum: 1 },
-            duracion_promedio: { $avg: '$duracion_segundos' }
-        }
-    },
-    {
-        $lookup: {
-            from: 'beat',
-            localField: '_id',
-            foreignField: '_id',
-            as: 'beat'
-        }
-    },
-    {
-        $unwind: '$beat'
-    },
-    {
-        $sort: { total_reproducciones: -1 }
-    },
-    {
-        $project: {
-            titulo: '$beat.titulo',
-            genero: '$beat.genero',
-            total_reproducciones: 1,
-            duracion_promedio: { $round: ['$duracion_promedio', 0] }
-        }
-    }
-]).forEach(stat => console.log(stat));
+    console.log("\n========== LIKES ==========\n");
 
-// ===== CONSULTAS DE COMENTARIOS =====
-console.log('\n========== COMENTARIOS ==========\n');
+    const topLikes = await db.collection('like_beat').aggregate([
+        {
+            $group: {
+                _id: '$beat_id',
+                total_likes: { $sum: 1 }
+            }
+        },
+        {
+            $lookup: {
+                from: 'beat',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'beat'
+            }
+        },
+        { $unwind: '$beat' },
+        { $sort: { total_likes: -1 } },
+        {
+            $project: {
+                titulo: '$beat.titulo',
+                genero: '$beat.genero',
+                total_likes: 1
+            }
+        }
+    ]).toArray();
 
-// Comentarios de un beat con información del usuario
-console.log('Comentarios del beat "Trap Vibes":');
-const trapBeat = db.beat.findOne({ titulo: 'Trap Vibes' });
-db.comentario.aggregate([
-    {
-        $match: { beat_id: trapBeat._id }
-    },
-    {
-        $lookup: {
-            from: 'usuario',
-            localField: 'usuario_id',
-            foreignField: '_id',
-            as: 'usuario'
-        }
-    },
-    {
-        $unwind: '$usuario'
-    },
-    {
-        $sort: { fecha: -1 }
-    },
-    {
-        $project: {
-            autor: '$usuario.nombre_usuario',
-            contenido: 1,
-            fecha: 1
-        }
-    }
-]).forEach(comentario => console.log(comentario));
+    topLikes.forEach(l => console.log(l));
 
-// ===== CONSULTAS DE LIKES =====
-console.log('\n========== LIKES ==========\n');
 
-// Beats con más likes
-console.log('Beats mas Likeados:');
-db.like_beat.aggregate([
-    {
-        $group: {
-            _id: '$beat_id',
-            total_likes: { $sum: 1 }
-        }
-    },
-    {
-        $lookup: {
-            from: 'beat',
-            localField: '_id',
-            foreignField: '_id',
-            as: 'beat'
-        }
-    },
-    {
-        $unwind: '$beat'
-    },
-    {
-        $sort: { total_likes: -1 }
-    },
-    {
-        $project: {
-            titulo: '$beat.titulo',
-            genero: '$beat.genero',
-            total_likes: 1
-        }
-    }
-]).forEach(like => console.log(like));
+    console.log("\n========== ANÁLISIS ==========\n");
 
-// Likes de un usuario
-console.log('\nBeats que le gustan a carlos_listener:');
-db.like_beat.aggregate([
-    {
-        $match: { usuario_id: carlos._id }
-    },
-    {
-        $lookup: {
-            from: 'beat',
-            localField: 'beat_id',
-            foreignField: '_id',
-            as: 'beat'
-        }
-    },
-    {
-        $unwind: '$beat'
-    },
-    {
-        $project: {
-            titulo: '$beat.titulo',
-            genero: '$beat.genero',
-            artista_id: '$beat.usuario_id',
-            fecha_like: '$fecha'
-        }
-    },
-    {
-        $lookup: {
-            from: 'usuario',
-            localField: 'artista_id',
-            foreignField: '_id',
-            as: 'artista'
-        }
-    },
-    {
-        $unwind: '$artista'
-    },
-    {
-        $project: {
-            titulo: 1,
-            genero: 1,
-            artista: '$artista.nombre_usuario',
-            fecha_like: 1
-        }
-    }
-]).forEach(like => console.log(like));
+    const ingresos = await db.collection('compra_detalle').aggregate([
+        {
+            $lookup: {
+                from: 'beat',
+                localField: 'beat_id',
+                foreignField: '_id',
+                as: 'beat'
+            }
+        },
+        { $unwind: '$beat' },
+        {
+            $lookup: {
+                from: 'usuario',
+                localField: 'beat.usuario_id',
+                foreignField: '_id',
+                as: 'artista'
+            }
+        },
+        { $unwind: '$artista' },
+        {
+            $group: {
+                _id: '$artista._id',
+                artista: { $first: '$artista.nombre_usuario' },
+                total_vendido: { $sum: '$precio_con_iva' },
+                beats_vendidos: { $sum: 1 }
+            }
+        },
+        { $sort: { total_vendido: -1 } }
+    ]).toArray();
 
-// ===== CONSULTAS ANALÍTICAS =====
-console.log('\n========== ANÁLISIS ==========\n');
+    ingresos.forEach(g => console.log(g));
 
-// Ingresos por artista
-console.log('Ingresos por Artista:');
-db.compra_detalle.aggregate([
-    {
-        $lookup: {
-            from: 'beat',
-            localField: 'beat_id',
-            foreignField: '_id',
-            as: 'beat'
-        }
-    },
-    {
-        $unwind: '$beat'
-    },
-    {
-        $lookup: {
-            from: 'usuario',
-            localField: 'beat.usuario_id',
-            foreignField: '_id',
-            as: 'artista'
-        }
-    },
-    {
-        $unwind: '$artista'
-    },
-    {
-        $group: {
-            _id: '$artista._id',
-            nombre_artista: { $first: '$artista.nombre_usuario' },
-            total_vendido: { $sum: '$precio_con_iva' },
-            beats_vendidos: { $sum: 1 }
-        }
-    },
-    {
-        $sort: { total_vendido: -1 }
-    }
-]).forEach(artista => console.log(artista));
 
-// Actividad reciente (últimas 24 horas simuladas)
-console.log('\nActividad Reciente:');
-const hace24h = new Date();
-hace24h.setDate(hace24h.getDate() - 1);
+    console.log("\n========== ACTIVIDAD RECIENTE ==========\n");
 
-console.log('Reproducciones recientes:', db.reproduccion.countDocuments({ fecha: { $gte: hace24h } }));
-console.log('Likes recientes:', db.like_beat.countDocuments({ fecha: { $gte: hace24h } }));
-console.log('Comentarios recientes:', db.comentario.countDocuments({ fecha: { $gte: hace24h } }));
-console.log('Compras recientes:', db.compra.countDocuments({ fecha: { $gte: hace24h } }));
+    const hace24h = new Date();
+    hace24h.setDate(hace24h.getDate() - 1);
 
-console.log('\nConsultas completadas');
+    console.log("Reproducciones recientes:", await db.collection('reproduccion').countDocuments({ fecha: { $gte: hace24h } }));
+    console.log("Likes recientes:", await db.collection('like_beat').countDocuments({ fecha: { $gte: hace24h } }));
+    console.log("Comentarios recientes:", await db.collection('comentario').countDocuments({ fecha: { $gte: hace24h } }));
+    console.log("Compras recientes:", await db.collection('compra').countDocuments({ fecha: { $gte: hace24h } }));
+
+
+    console.log("\nConsultas completadas ✔");
+
+    await close();
+}
+
+runQueries();
