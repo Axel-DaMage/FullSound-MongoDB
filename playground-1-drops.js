@@ -1,2 +1,0 @@
-use('fullsound');
-db.dropDatabase();

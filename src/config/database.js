@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const uri = process.env.MONGODB_URI || 'mongodb+srv://axeld4mage_db_user:JuvqjS9NnpKoB8N9@cluster-fullsound.jqvqmp8.mongodb.net/?appName=Cluster-FullSound';
 const dbName = process.env.DB_NAME || 'fullsound';
 
 let client;

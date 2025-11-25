@@ -62,12 +62,12 @@ db.createCollection('beat', {
                     description: 'Descripción del beat'
                 },
                 precio: {
-                    bsonType: 'double',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
-                    description: 'Precio del beat'
+                    description: 'Precio del beat en CLP (número entero)'
                 },
                 bpm: {
-                    bsonType: 'int',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     maximum: 300,
                     description: 'Beats por minuto'
@@ -89,12 +89,12 @@ db.createCollection('beat', {
                     description: 'URL de la imagen de portada'
                 },
                 reproducciones: {
-                    bsonType: 'int',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     description: 'Contador de reproducciones'
                 },
                 likes: {
-                    bsonType: 'int',
+                    bsonType: ['int', 'double', 'long'],
                     minimum: 0,
                     description: 'Contador de likes'
                 }

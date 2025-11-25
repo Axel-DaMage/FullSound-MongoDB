@@ -9,6 +9,15 @@ async function seedData() {
     await connect();
     const db = getDb();
 
+    // ===== VERIFICAR SI YA HAY DATOS =====
+    const usuariosExistentes = await db.collection('usuario').countDocuments();
+    if (usuariosExistentes > 0) {
+        console.log('\nLa base de datos ya contiene datos.');
+        console.log('Por favor, ejecuta primero "playground-1-drops.mongodb.js" para limpiar la BD.\n');
+        await close();
+        return;
+    }
+
     // ===== PASO 1: CREAR USUARIOS CON CONTRASEÑAS HASHEADAS =====
     console.log('CREANDO USUARIOS');
 
@@ -384,38 +393,10 @@ async function seedData() {
 
     console.log('Beats creados:', beats.insertedIds);
 
-    // ===== CONSULTAS DE VERIFICACIÓN =====
-    console.log('\n========== RESUMEN DE DATOS ==========\n');
+    // ===== CREAR REPRODUCCIONES =====
+    console.log('CREANDO REPRODUCCIONES');
 
-    console.log('Total usuarios:', await db.collection('usuario').countDocuments());
-    console.log('Total beats:', await db.collection('beat').countDocuments());
-    console.log('Total reproducciones:', await db.collection('reproduccion').countDocuments());
-    console.log('Total likes:', await db.collection('like_beat').countDocuments());
-    console.log('Total comentarios:', await db.collection('comentario').countDocuments());
-    console.log('Total compras:', await db.collection('compra').countDocuments());
-
-    console.log('\n========== BEATS MÁS POPULARES ==========\n');
-    const beatsPopulares = await db.collection('beat').find().sort({ reproducciones: -1, likes: -1 }).limit(3).toArray();
-    beatsPopulares.forEach(beat => {
-        console.log(`${beat.titulo} - ${beat.genero}`);
-        console.log(`  Reproducciones: ${beat.reproducciones} | Likes: ${beat.likes} | Precio: $${beat.precio}`);
-    });
-
-    console.log('\nBase de datos poblada exitosamente');
-
-    await close();
-}
-
-seedData().catch(error => {
-    console.error('Error:', error);
-    process.exit(1);
-});
-
-
-// ===== CREAR REPRODUCCIONES =====
-console.log('CREANDO REPRODUCCIONES');
-
-await db.collection('reproduccion').insertMany([
+    await db.collection('reproduccion').insertMany([
     {
         beat_id: beats.insertedIds['0'],
         usuario_id: maria._id,
@@ -537,4 +518,31 @@ await db.collection('like_beat').insertMany([
     }
 ]);
 
-console.log('Likes creados');
+    console.log('Likes creados');
+
+    // ===== CONSULTAS DE VERIFICACIÓN =====
+    console.log('\n========== RESUMEN DE DATOS ==========\n');
+
+    console.log('Total usuarios:', await db.collection('usuario').countDocuments());
+    console.log('Total beats:', await db.collection('beat').countDocuments());
+    console.log('Total reproducciones:', await db.collection('reproduccion').countDocuments());
+    console.log('Total likes:', await db.collection('like_beat').countDocuments());
+    console.log('Total comentarios:', await db.collection('comentario').countDocuments());
+    console.log('Total compras:', await db.collection('compra').countDocuments());
+
+    console.log('\n========== BEATS MÁS POPULARES ==========\n');
+    const beatsPopulares = await db.collection('beat').find().sort({ reproducciones: -1, likes: -1 }).limit(3).toArray();
+    beatsPopulares.forEach(beat => {
+        console.log(`${beat.titulo} - ${beat.genero}`);
+        console.log(`  Reproducciones: ${beat.reproducciones} | Likes: ${beat.likes} | Precio: $${beat.precio}`);
+    });
+
+    console.log('\nBase de datos poblada exitosamente');
+
+    await close();
+}
+
+seedData().catch(error => {
+    console.error('Error:', error);
+    process.exit(1);
+});
