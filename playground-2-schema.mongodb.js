@@ -227,7 +227,6 @@ db.createCollection('reproduccion', {
     }
 });
 
-// Crear índices
 db.reproduccion.createIndex({ beat_id: 1 });
 db.reproduccion.createIndex({ usuario_id: 1 });
 db.reproduccion.createIndex({ fecha: -1 });
@@ -250,34 +249,29 @@ db.createCollection('comentario', {
                 },
                 contenido: {
                     bsonType: 'string',
-                    minLength: 1,
-                    description: 'Contenido del comentario'
+                    minLength: 1
                 },
                 fecha: {
-                    bsonType: 'date',
-                    description: 'Fecha del comentario'
+                    bsonType: 'date'
                 },
                 editado: {
-                    bsonType: 'bool',
-                    description: 'Indica si el comentario fue editado'
+                    bsonType: 'bool'
                 },
                 comentario_padre_id: {
-                    bsonType: ['objectId', 'null'],
-                    description: 'Referencia a comentario padre (para respuestas o hilos)'
+                    bsonType: ['objectId', 'null']
                 }
             }
         }
     }
 });
 
-// Crear índices
 db.comentario.createIndex({ usuario_id: 1 });
 db.comentario.createIndex({ beat_id: 1 });
 db.comentario.createIndex({ fecha: -1 });
 db.comentario.createIndex({ comentario_padre_id: 1 });
 
 
-// ===== 8. LIKES =====
+// ===== 8. LIKE_BEAT =====
 db.createCollection('like_beat', {
     validator: {
         $jsonSchema: {
@@ -285,27 +279,18 @@ db.createCollection('like_beat', {
             required: ['usuario_id', 'beat_id'],
             properties: {
                 usuario_id: {
-                    bsonType: 'objectId',
-                    description: 'Referencia al usuario que dio like'
+                    bsonType: 'objectId'
                 },
                 beat_id: {
-                    bsonType: 'objectId',
-                    description: 'Referencia al beat que recibió like'
+                    bsonType: 'objectId'
                 },
                 fecha: {
-                    bsonType: 'date',
-                    description: 'Fecha del like'
+                    bsonType: 'date'
                 }
             }
         }
     }
 });
 
-// Índice único para evitar likes duplicados
 db.like_beat.createIndex({ usuario_id: 1, beat_id: 1 }, { unique: true });
 db.like_beat.createIndex({ beat_id: 1 });
-
-
-// ===== MENSAJE DE CONFIRMACIÓN =====
-console.log('Todas las colecciones han sido creadas exitosamente');
-console.log('Colecciones disponibles:', db.getCollectionNames());
