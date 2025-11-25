@@ -159,11 +159,16 @@ async function seedData() {
     console.log('Usuarios creados:', usuarios.insertedIds);
 
     // ===== PASO 2: OBTENER IDs DE USUARIOS =====
+    const juan123 = await db.collection('usuario').findOne({ nombre_usuario: 'juan123' });
     const maria = await db.collection('usuario').findOne({ nombre_usuario: 'maria_music' });
+    const rocklover = await db.collection('usuario').findOne({ nombre_usuario: 'rocklover' });
     const ana = await db.collection('usuario').findOne({ nombre_usuario: 'ana_star' });
     const dj_luis = await db.collection('usuario').findOne({ nombre_usuario: 'dj_luis' });
     const sofia = await db.collection('usuario').findOne({ nombre_usuario: 'sofia_beats' });
     const carlos = await db.collection('usuario').findOne({ nombre_usuario: 'carlos_groove' });
+    const valentina = await db.collection('usuario').findOne({ nombre_usuario: 'valentina' });
+    const raptor99 = await db.collection('usuario').findOne({ nombre_usuario: 'raptor99' });
+    const electrofan = await db.collection('usuario').findOne({ nombre_usuario: 'electrofan' });
 
     // ===== PASO 3: CREAR BEATS =====
     console.log('CREANDO BEATS')
@@ -392,6 +397,255 @@ async function seedData() {
     ]);
 
     console.log('Beats creados:', beats.insertedIds);
+
+    // ===== PASO 4: CREAR COMPRAS =====
+    console.log('CREANDO COMPRAS');
+
+    // Función auxiliar para calcular IVA
+    const calcularCompra = (subtotal) => ({
+        subtotal: subtotal,
+        iva_total: Math.round(subtotal * 0.19 * 100) / 100,
+        total_con_iva: Math.round(subtotal * 1.19 * 100) / 100
+    });
+
+    const compras = await db.collection('compra').insertMany([
+        {
+            usuario_id: juan123._id,
+            ...calcularCompra(19900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: rocklover._id,
+            ...calcularCompra(50400),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: valentina._id,
+            ...calcularCompra(24900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: raptor99._id,
+            ...calcularCompra(21900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: electrofan._id,
+            ...calcularCompra(17900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: juan123._id,
+            ...calcularCompra(31900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: rocklover._id,
+            ...calcularCompra(19500),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: valentina._id,
+            ...calcularCompra(42000),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: raptor99._id,
+            ...calcularCompra(23500),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: juan123._id,
+            ...calcularCompra(35900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: valentina._id,
+            ...calcularCompra(29900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: electrofan._id,
+            ...calcularCompra(27900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: juan123._id,
+            ...calcularCompra(28900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: rocklover._id,
+            ...calcularCompra(23900),
+            fecha: new Date(),
+            estado: 'completada'
+        },
+        {
+            usuario_id: raptor99._id,
+            ...calcularCompra(25900),
+            fecha: new Date(),
+            estado: 'completada'
+        }
+    ]);
+
+    console.log('Compras creadas:', compras.insertedIds);
+
+    // ===== PASO 5: CREAR DETALLES DE COMPRAS =====
+    console.log('CREANDO DETALLES DE COMPRAS');
+
+    await db.collection('compra_detalle').insertMany([
+        // Compra 1, Beat 1
+        {
+            compra_id: compras.insertedIds['0'],
+            beat_id: beats.insertedIds['0'],
+            precio_base: 19900,
+            iva_monto: Math.round(19900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(19900 * 1.19 * 100) / 100
+        },
+        // Compra 2, Beat 2
+        {
+            compra_id: compras.insertedIds['1'],
+            beat_id: beats.insertedIds['1'],
+            precio_base: 27500,
+            iva_monto: Math.round(27500 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(27500 * 1.19 * 100) / 100
+        },
+        // Compra 2, Beat 3
+        {
+            compra_id: compras.insertedIds['1'],
+            beat_id: beats.insertedIds['2'],
+            precio_base: 22900,
+            iva_monto: Math.round(22900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(22900 * 1.19 * 100) / 100
+        },
+        // Compra 3, Beat 4
+        {
+            compra_id: compras.insertedIds['2'],
+            beat_id: beats.insertedIds['3'],
+            precio_base: 24900,
+            iva_monto: Math.round(24900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(24900 * 1.19 * 100) / 100
+        },
+        // Compra 4, Beat 5
+        {
+            compra_id: compras.insertedIds['3'],
+            beat_id: beats.insertedIds['4'],
+            precio_base: 21900,
+            iva_monto: Math.round(21900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(21900 * 1.19 * 100) / 100
+        },
+        // Compra 5, Beat 6
+        {
+            compra_id: compras.insertedIds['4'],
+            beat_id: beats.insertedIds['5'],
+            precio_base: 17900,
+            iva_monto: Math.round(17900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(17900 * 1.19 * 100) / 100
+        },
+        // Compra 6, Beat 7
+        {
+            compra_id: compras.insertedIds['5'],
+            beat_id: beats.insertedIds['6'],
+            precio_base: 31900,
+            iva_monto: Math.round(31900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(31900 * 1.19 * 100) / 100
+        },
+        // Compra 7, Beat 8
+        {
+            compra_id: compras.insertedIds['6'],
+            beat_id: beats.insertedIds['7'],
+            precio_base: 19500,
+            iva_monto: Math.round(19500 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(19500 * 1.19 * 100) / 100
+        },
+        // Compra 8, Beat 9
+        {
+            compra_id: compras.insertedIds['7'],
+            beat_id: beats.insertedIds['8'],
+            precio_base: 21500,
+            iva_monto: Math.round(21500 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(21500 * 1.19 * 100) / 100
+        },
+        // Compra 8, Beat 10
+        {
+            compra_id: compras.insertedIds['7'],
+            beat_id: beats.insertedIds['9'],
+            precio_base: 20500,
+            iva_monto: Math.round(20500 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(20500 * 1.19 * 100) / 100
+        },
+        // Compra 9, Beat 11
+        {
+            compra_id: compras.insertedIds['8'],
+            beat_id: beats.insertedIds['10'],
+            precio_base: 23500,
+            iva_monto: Math.round(23500 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(23500 * 1.19 * 100) / 100
+        },
+        // Compra 10, Beat 12
+        {
+            compra_id: compras.insertedIds['9'],
+            beat_id: beats.insertedIds['11'],
+            precio_base: 35900,
+            iva_monto: Math.round(35900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(35900 * 1.19 * 100) / 100
+        },
+        // Compra 11, Beat 13
+        {
+            compra_id: compras.insertedIds['10'],
+            beat_id: beats.insertedIds['12'],
+            precio_base: 29900,
+            iva_monto: Math.round(29900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(29900 * 1.19 * 100) / 100
+        },
+        // Compra 12, Beat 14
+        {
+            compra_id: compras.insertedIds['11'],
+            beat_id: beats.insertedIds['13'],
+            precio_base: 27900,
+            iva_monto: Math.round(27900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(27900 * 1.19 * 100) / 100
+        },
+        // Compra 13, Beat 15
+        {
+            compra_id: compras.insertedIds['12'],
+            beat_id: beats.insertedIds['14'],
+            precio_base: 28900,
+            iva_monto: Math.round(28900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(28900 * 1.19 * 100) / 100
+        },
+        // Compra 14, Beat 16
+        {
+            compra_id: compras.insertedIds['13'],
+            beat_id: beats.insertedIds['15'],
+            precio_base: 23900,
+            iva_monto: Math.round(23900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(23900 * 1.19 * 100) / 100
+        },
+        // Compra 15, Beat 17
+        {
+            compra_id: compras.insertedIds['14'],
+            beat_id: beats.insertedIds['16'],
+            precio_base: 25900,
+            iva_monto: Math.round(25900 * 0.19 * 100) / 100,
+            precio_con_iva: Math.round(25900 * 1.19 * 100) / 100
+        }
+    ]);
+
+    console.log('Detalles de compras creados');
 
     // ===== CREAR REPRODUCCIONES =====
     console.log('CREANDO REPRODUCCIONES');
