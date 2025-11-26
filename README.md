@@ -24,7 +24,6 @@ PORT=3000
 
 El proyecto utiliza archivos MongoDB Playground para operaciones CRUD:
 
-- `playground-0-ejecutar-todo.mongodb.js` - Ejecuta todos los playgrounds en secuencia
 - `playground-1-drops.mongodb.js` - Elimina colecciones existentes
 - `playground-2-esquema.mongodb.js` - Define esquemas de validación
 - `playground-CRUD-usuarios.mongodb.js` - CRUD de usuarios
