@@ -2,7 +2,7 @@
 
 Proyecto Node.js con MongoDB utilizando el driver nativo de MongoDB.
 
-## Instalación
+## Instalación de dependencias
 
 ```bash
 npm install
@@ -13,44 +13,40 @@ npm install
 Crea un archivo `.env` con tu configuración de MongoDB:
 
 ```env
-MONGODB_URI=mongodb://localhost:27017/fullsound
+MONGODB_URI=mongodb:tuconexionmongodb
 DB_NAME=fullsound
 PORT=3000
 ```
 
-## Scripts Disponibles
+## Estructura del Proyecto
 
-- `npm start` - Inicia la aplicación
-- `npm run dev` - Modo desarrollo con nodemon
-- `npm run seed` - Poblar base de datos con datos de ejemplo
+### Archivos Playground
 
-## Sistema de Contraseñas
+El proyecto utiliza archivos MongoDB Playground para operaciones CRUD:
 
-El proyecto utiliza bcrypt para hash seguro de contraseñas.
+- `playground-0-ejecutar-todo.mongodb.js` - Ejecuta todos los playgrounds en secuencia
+- `playground-1-drops.mongodb.js` - Elimina colecciones existentes
+- `playground-2-esquema.mongodb.js` - Define esquemas de validación
+- `playground-CRUD-usuarios.mongodb.js` - CRUD de usuarios
+- `playground-CRUD-beats.mongodb.js` - CRUD de beats
+- `playground-CRUD-compras.mongodb.js` - CRUD de compras y detalles
+- `playground-CRUD-reproducciones.mongodb.js` - CRUD de reproducciones
+- `playground-CRUD-comentarios.mongodb.js` - CRUD de comentarios
+- `playground-CRUD-likes.mongodb.js` - CRUD de likes en beats
 
-### Crear usuario
-```javascript
-const { crearUsuario } = require('./src/models/usuario');
+### Colecciones
 
-await crearUsuario({
-  nombre_usuario: 'usuario',
-  correo: 'usuario@example.com',
-  contrasena: 'contraseña',
-  id_tipo_usuario: tipoUsuarioId
-});
-```
-
-### Autenticar usuario
-```javascript
-const { autenticarUsuario } = require('./src/models/usuario');
-
-const usuario = await autenticarUsuario('usuario@example.com', 'contraseña');
-```
+- **usuario** - Usuarios del sistema
+- **beat** - Beats musicales disponibles
+- **compra** - Compras realizadas
+- **compra_detalle** - Detalles de cada compra
+- **reproduccion** - Reproducciones de beats (anónimas o autenticadas)
+- **comentario** - Comentarios en beats (soporta anidación)
+- **like_beat** - Likes dados a beats
 
 ## Dependencias
 
 - mongodb - Driver oficial de MongoDB
-- bcrypt - Hash de contraseñas
 - dotenv - Variables de entorno
 - nodemon - Desarrollo
 
@@ -58,3 +54,4 @@ const usuario = await autenticarUsuario('usuario@example.com', 'contraseña');
 
 - Node.js >= 14.x
 - MongoDB >= 4.x
+- MongoDB for VS Code (recomendado para ejecutar playgrounds)
